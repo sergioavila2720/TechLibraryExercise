@@ -6,6 +6,8 @@ using AutoMapper;
 using TechLibrary.Domain;
 using TechLibrary.Models;
 using TechLibrary.Services;
+using TechLibrary.Contracts.Requests;
+using System;
 
 namespace TechLibrary.Controllers
 {
@@ -25,13 +27,16 @@ namespace TechLibrary.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] PageQuery pageQuery)
         {
             _logger.LogInformation("Get all books");
 
-            var books = await _bookService.GetBooksAsync();
+            // Going to pass the queries to the book service
+            var pagefilter = _mapper.Map<PageFilter>(pageQuery);
+            var books = await _bookService.GetBooksAsync(pagefilter);
 
             var bookResponse = _mapper.Map<List<BookResponse>>(books);
+
 
             return Ok(bookResponse);
         }
@@ -43,9 +48,52 @@ namespace TechLibrary.Controllers
 
             var book = await _bookService.GetBookByIdAsync(id);
 
+            //var bookResponse = new ApiResponse<BookResponse>(_mapper.Map<BookResponse>(book));
             var bookResponse = _mapper.Map<BookResponse>(book);
 
             return Ok(bookResponse);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBook([FromBody] BookResponse bookRequest)
+        {
+            try
+            {
+                //string dateInput = "Jan 1, 2009";
+                //var parsedDate = DateTime.Parse(dateInput);
+                if (!string.IsNullOrEmpty(bookRequest.PublishedDate))
+                    bookRequest.PublishedDate = DateTime.Parse(bookRequest.PublishedDate).ToString();
+                var mapBookRequest = _mapper.Map<Book>(bookRequest);
+                await _bookService.CreateNewBookAsync(mapBookRequest);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+            
+
+            var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
+
+            return Created(baseUrl, bookRequest);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditBook(int id, [FromBody] BookResponse bookRequest)
+        {
+            try {
+                bookRequest.BookId = id;
+
+                var mapBookRequest = _mapper.Map<Book>(bookRequest);
+
+                await _bookService.UpdateBookAsync(mapBookRequest);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            
+
+            return Ok(bookRequest);
+        }
+
     }
 }

@@ -5,6 +5,7 @@ Vue.use(VueRouter);
 
 const Home = () => import(/* webpackChunkName: "Home" */ './components/Home.vue');
 const Book = () => import(/* webpackChunkName: "Book" */ './components/Book.vue');
+const AddBook = () => import(/* webpackChunkName: "AddBook" */ './components/AddBook.vue');
 
 const router = new VueRouter({
   routes: [
@@ -14,7 +15,13 @@ const router = new VueRouter({
       path: '/book/:id',
       component: Book,
       props: true
-    }
+    },
+        {
+            name: 'book_add_view',
+            path: '/book',
+            component: AddBook,
+            props: true
+    },
   ]
 });
 
