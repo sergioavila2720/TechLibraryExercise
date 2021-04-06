@@ -9,7 +9,7 @@ namespace TechLibrary.MappingProfiles
         public DomainToResponseProfile()
         {
             CreateMap<Book, BookResponse>().ForMember(x => x.Descr, opt => opt.MapFrom(src => src.ShortDescr));
-            // Added a new mapper to take care of the requests to write to the database
+            // Added a new mapper to handle request coming into the database
             CreateMap<BookResponse, Book>().ForMember(x => x.ShortDescr, opt => opt.MapFrom(src => src.Descr));
         }
     }

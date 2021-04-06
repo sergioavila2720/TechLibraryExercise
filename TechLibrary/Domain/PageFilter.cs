@@ -9,5 +9,6 @@ namespace TechLibrary.Domain
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public string SearchStr { get; set; }
     }
 }

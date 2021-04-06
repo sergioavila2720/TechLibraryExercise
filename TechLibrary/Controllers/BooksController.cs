@@ -26,12 +26,13 @@ namespace TechLibrary.Controllers
             _mapper = mapper;
         }
 
+        // Going to pass a Page query obj that will hold the Pagenumber pagesize and search string
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PageQuery pageQuery)
         {
             _logger.LogInformation("Get all books");
 
-            // Going to pass the queries to the book service
+            // map query to PageFilter helper class
             var pagefilter = _mapper.Map<PageFilter>(pageQuery);
             var books = await _bookService.GetBooksAsync(pagefilter);
 
@@ -48,7 +49,6 @@ namespace TechLibrary.Controllers
 
             var book = await _bookService.GetBookByIdAsync(id);
 
-            //var bookResponse = new ApiResponse<BookResponse>(_mapper.Map<BookResponse>(book));
             var bookResponse = _mapper.Map<BookResponse>(book);
 
             return Ok(bookResponse);
@@ -59,10 +59,9 @@ namespace TechLibrary.Controllers
         {
             try
             {
-                //string dateInput = "Jan 1, 2009";
-                //var parsedDate = DateTime.Parse(dateInput);
                 if (!string.IsNullOrEmpty(bookRequest.PublishedDate))
                     bookRequest.PublishedDate = DateTime.Parse(bookRequest.PublishedDate).ToString();
+                // now map BookResponse to Book class to be able to save it to database
                 var mapBookRequest = _mapper.Map<Book>(bookRequest);
                 await _bookService.CreateNewBookAsync(mapBookRequest);
             }
@@ -79,6 +78,7 @@ namespace TechLibrary.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> EditBook(int id, [FromBody] BookResponse bookRequest)
         {
+            // Handle Put requests 
             try {
                 bookRequest.BookId = id;
 

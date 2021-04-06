@@ -31,10 +31,19 @@ namespace TechLibrary.Services
         {
             // if the page filter is not null return a list of the filtered pages, otherwise return a list containing everything 
             var queryable = _dataContext.Books.AsQueryable();
+            
             if (pageFilter != null)
             {
+                // Check if the search filter is empty and filter by it.
+                if (!string.IsNullOrEmpty(pageFilter.SearchStr))
+                {
+                    queryable = _dataContext.Books
+                                            .Where(t0 => t0.Title.ToLower().Contains(pageFilter.SearchStr.ToLower()) || 
+                                                         t0.ShortDescr.ToLower().Contains(pageFilter.SearchStr.ToLower())).AsQueryable();
+                }
                 var skip = (pageFilter.PageNumber - 1) * pageFilter.PageSize;
-                queryable = _dataContext.Books.Skip(skip).Take(pageFilter.PageSize).AsQueryable();
+                queryable = queryable.Skip(skip).Take(pageFilter.PageSize).AsQueryable();
+                //queryable = _dataContext.Books.Skip(skip).Take(pageFilter.PageSize).AsQueryable();
             }
             
 
@@ -45,6 +54,7 @@ namespace TechLibrary.Services
         {
             return await _dataContext.Books.SingleOrDefaultAsync(x => x.BookId == bookid);
         }
+        // Method to Post a new book into the database
         public async Task<bool> CreateNewBookAsync(Book book)
         {
             _dataContext.Books.Add(book);
@@ -53,7 +63,7 @@ namespace TechLibrary.Services
             return true;
 
         }
-
+        // Method to Update the book details
         public async Task<bool> UpdateBookAsync(Book book)
         {
             _dataContext.Entry(book).State = EntityState.Modified;

@@ -12,6 +12,7 @@ namespace TechLibrary.MappingProfiles
     {
         public RequestToDomainProfile()
         {
+            // helper class to map query params to Page filter class
             CreateMap<PageQuery, PageFilter>();
         }
     }

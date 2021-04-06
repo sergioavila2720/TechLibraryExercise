@@ -15,7 +15,7 @@
             <br />
 
 
-            <b-button @click.stop="stop" variant="primary">Back</b-button>
+            <b-button @click="goBack" variant="primary">Back</b-button>
 
             <button style="float: right; margin-left: 10px;" class="btn btn-success" v-on:click="Save()">Submit</button>
             <button style="float: right;" v-on:click="isHidden = !isHidden" class="btn btn-success">Toggle Edit</button>
@@ -38,7 +38,7 @@
                 .then(response => {
                     this.book = response.data;
                 });
-            console.log('route', this.$route);
+            //console.log('route', this.$route);
         },
         methods: {
             Save() {
@@ -57,7 +57,8 @@
                 this.isHidden = false;
                     
             },
-            stop: function () {
+            goBack: function () {
+                // store current pageNumber in the query params so that when the user hits back it takes them to the page they were on
                 this.$router.push({ path: '/', query: { PageNumber: this.$route.params.PageNumber } })
             }
         }
